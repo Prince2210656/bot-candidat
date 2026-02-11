@@ -1,0 +1,5 @@
+streamlit
+pandas
+google-auth
+google-spreadsheet
+google-api-python-client
