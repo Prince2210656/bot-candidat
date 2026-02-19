@@ -42,6 +42,10 @@ if st.button("🔥 LANCER LE SOURCING ET RECEVOIR MON EMAIL IA"):
             # Streamlit va lire les clés secrètes et créer le fichier juste pour Node.js
             try:
                 creds_dict = dict(st.secrets["gcp_service_account"])
+                
+                # CORRECTION ICI : On répare les retours à la ligne de la clé privée
+                creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+                
                 with open("credentials.json", "w") as f:
                     json.dump(creds_dict, f)
             except Exception as e:
