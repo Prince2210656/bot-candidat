@@ -7,7 +7,6 @@ import streamlit as st
 
 # --- 1. INSTALLATION AUTOMATIQUE NODE.JS ---
 if not os.path.exists("node_modules"):
-    # C'est ici qu'on force NPM à ignorer les conflits de version sur le serveur
     subprocess.run(["npm", "install", "--legacy-peer-deps"])
 
 st.set_page_config(page_title="IA-Hunter Pro", layout="wide")
@@ -39,17 +38,23 @@ if st.button("🔥 LANCER LE SOURCING ET RECEVOIR MON EMAIL IA"):
             st.write(f"🕵️ Recherche d'offres pour {user_email}...")
             
             # --- 2. CRÉATION DU FICHIER CREDENTIALS.JSON ---
-            # Streamlit va lire les clés secrètes et créer le fichier juste pour Node.js
             try:
                 creds_dict = dict(st.secrets["gcp_service_account"])
+                pk = str(creds_dict["private_key"])
                 
-                # CORRECTION ICI : On répare les retours à la ligne de la clé privée
-                creds_dict["private_key"] = creds_dict["private_key"].replace("\\n", "\n")
+                # Conversion absolue des sauts de ligne pour OpenSSL
+                pk = pk.replace("\\n", "\n").replace("\\r", "")
+                creds_dict["private_key"] = pk
                 
+                # Sécurité : on bloque le script si la clé est mal copiée
+                if "-----BEGIN PRIVATE KEY-----" not in pk or "-----END PRIVATE KEY-----" not in pk:
+                    st.error("❌ Erreur : La clé privée dans les Secrets Streamlit est incomplète ou mal copiée.")
+                    st.stop()
+                    
                 with open("credentials.json", "w") as f:
                     json.dump(creds_dict, f)
             except Exception as e:
-                st.error("Erreur : Impossible de charger les clés Google depuis les Secrets Streamlit.")
+                st.error("❌ Erreur : Impossible de lire les Secrets Streamlit.")
                 st.stop()
             
             # --- 3. LANCEMENT DU SCRIPT NODE.JS ---
