@@ -7,7 +7,8 @@ import streamlit as st
 
 # --- 1. INSTALLATION AUTOMATIQUE NODE.JS ---
 if not os.path.exists("node_modules"):
-    subprocess.run(["npm", "install"])
+    # C'est ici qu'on force NPM à ignorer les conflits de version sur le serveur
+    subprocess.run(["npm", "install", "--legacy-peer-deps"])
 
 st.set_page_config(page_title="IA-Hunter Pro", layout="wide")
 
