@@ -24,7 +24,13 @@ const userEmail = args[3] || ""; // L'email de ton ami qui recevra la démo
   await doc.loadInfo();
   const sheet = doc.sheetsByTitle[SHEET_TITLE];
 
-  const browser = await puppeteer.launch({ headless: false });
+  // --- CORRECTION POUR LE SERVEUR STREAMLIT ---
+  // Le mode headless et les arguments sont obligatoires sur Linux
+  const browser = await puppeteer.launch({ 
+    headless: "new", 
+    args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+  });
+  
   const page = await browser.newPage();
 
   let urlCible = "";

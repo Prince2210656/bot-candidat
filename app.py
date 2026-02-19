@@ -1,7 +1,13 @@
-import streamlit as st
+import os
+import json
 import subprocess
-import pandas as pd
 import time
+import pandas as pd
+import streamlit as st
+
+# --- 1. INSTALLATION AUTOMATIQUE NODE.JS ---
+if not os.path.exists("node_modules"):
+    subprocess.run(["npm", "install"])
 
 st.set_page_config(page_title="IA-Hunter Pro", layout="wide")
 
@@ -31,7 +37,17 @@ if st.button("🔥 LANCER LE SOURCING ET RECEVOIR MON EMAIL IA"):
         with st.status("Initialisation du robot...", expanded=True) as status:
             st.write(f"🕵️ Recherche d'offres pour {user_email}...")
             
-            # On envoie les 4 arguments au robot Node.js
+            # --- 2. CRÉATION DU FICHIER CREDENTIALS.JSON ---
+            # Streamlit va lire les clés secrètes et créer le fichier juste pour Node.js
+            try:
+                creds_dict = dict(st.secrets["gcp_service_account"])
+                with open("credentials.json", "w") as f:
+                    json.dump(creds_dict, f)
+            except Exception as e:
+                st.error("Erreur : Impossible de charger les clés Google depuis les Secrets Streamlit.")
+                st.stop()
+            
+            # --- 3. LANCEMENT DU SCRIPT NODE.JS ---
             subprocess.run(["node", "index.js", domaine, ville, source, user_email])
             
             st.write("🤖 Rédaction et envoi de l'email personnalisé...")
@@ -47,6 +63,6 @@ st.divider()
 st.subheader("📊 Dernières opportunités détectées")
 try:
     df = pd.read_csv('candidatures_potentielles.csv')
-    st.dataframe(df, width='stretch') # Corrigé pour 2026
+    st.dataframe(df, width='stretch')
 except Exception:
     st.info("Le tableau s'affichera après le premier sourcing.")
