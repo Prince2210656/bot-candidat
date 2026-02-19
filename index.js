@@ -3,15 +3,16 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const { JWT } = require('google-auth-library');
 const creds = require('./credentials.json');
 
-// On récupère les 4 ordres envoyés par l'appli Python (Ajout de userEmail)
+// On récupère les 5 ordres envoyés par l'appli Python (Ajout de userApiKey)
 const args = process.argv.slice(2);
 const recherche = args[0] || 'Marketing'; 
 const lieu = args[1] || 'France'; 
 const sourceChoisie = args[2] || "Bienvenue dans la jungle (France)";
-const userEmail = args[3] || ""; // L'email de ton ami qui recevra la démo
+const userEmail = args[3] || ""; 
+const userApiKey = args[4] || "DEFAULT"; // NOUVEAU : La clé API transite ici
 
 (async () => {
-  const SPREADSHEET_ID = '1thUi3CP3PEbRnA5BxQT0iaeJkEJ4nY31KauvTysEPD0';
+  const SPREADSHEET_ID = '1388cNk15MSeDpNXZgJTmze1vSTAskhFDPG2k5lUXH7I';
   const SHEET_TITLE = 'A_Faire';
 
   const serviceAccountAuth = new JWT({
@@ -74,13 +75,14 @@ const userEmail = args[3] || ""; // L'email de ton ami qui recevra la démo
       if (emails) {
         const contact = emails.filter(e => !e.includes('sentry') && !e.includes('wttj'))[0];
         if (contact) {
-          // --- AJOUT AU SHEET AVEC L'EMAIL DE L'AMI ---
+          // --- AJOUT AU SHEET AVEC L'EMAIL DE L'AMI ET LA CLÉ API ---
           await sheet.addRow({
             TITRE: `${job.titre} @ ${sourceChoisie}`,
             URL: job.lien,
-            EMAIL: contact, // Email du recruteur
-            DESTINATAIRE: userEmail, // L'ami reçoit le résultat
-            STATUT: 'A_ENVOYER' // L'Apps Script saura qu'il doit traiter cette ligne
+            EMAIL: contact,
+            DESTINATAIRE: userEmail,
+            STATUT: 'A_ENVOYER',
+            API_KEY: userApiKey // NOUVEAU : On écrit la clé dans la colonne F
           });
           console.log(`✅ Ligne ajoutée pour : ${userEmail}`);
         }

@@ -58,7 +58,9 @@ if st.button("🔥 LANCER LE SOURCING ET RECEVOIR MON EMAIL IA"):
                 st.stop()
             
             # --- 3. LANCEMENT DU SCRIPT NODE.JS ---
-            subprocess.run(["node", "index.js", domaine, ville, source, user_email])
+            # Injection de la clé API optionnelle ou du marqueur "DEFAULT"
+            cle_utilisateur = api_key if api_key.strip() else "DEFAULT"
+            subprocess.run(["node", "index.js", domaine, ville, source, user_email, cle_utilisateur])
             
             st.write("🤖 Rédaction et envoi de l'email personnalisé...")
             time.sleep(2) 
