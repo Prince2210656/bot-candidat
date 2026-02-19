@@ -11,7 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "google-auth-library": "^10.5.0",
+    "google-auth-library": "^8.9.0",
     "google-spreadsheet": "^4.0.3",
     "puppeteer": "^24.36.0"
   }
